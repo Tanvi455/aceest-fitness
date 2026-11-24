@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify, request
 
 DEFAULT_CLASSES = [
@@ -22,17 +24,31 @@ DEFAULT_CLASSES = [
 
 def create_app(initial_classes=None):
     app = Flask(__name__)
-    classes = [dict(fitness_class) for fitness_class in (
-        DEFAULT_CLASSES if initial_classes is None else initial_classes
-    )]
-    next_id = max((fitness_class["id"] for fitness_class in classes), default=0) + 1
+    classes = [
+        dict(fitness_class)
+        for fitness_class in (
+            DEFAULT_CLASSES if initial_classes is None else initial_classes
+        )
+    ]
+    next_id = max(
+        (fitness_class["id"] for fitness_class in classes),
+        default=0,
+    ) + 1
 
     @app.get("/")
     def index():
+        variant = os.getenv("APP_VARIANT", "standard")
+        messages = {
+            "a": "Welcome to ACEest Fitness",
+            "b": "Welcome to ACEest Fitness Premium",
+        }
+
         return jsonify(
             {
                 "name": "ACEest Fitness & Gym API",
                 "status": "online",
+                "variant": variant,
+                "message": messages.get(variant, "Welcome to ACEest Fitness"),
                 "endpoints": ["/health", "/classes", "/classes/<id>"],
             }
         )
@@ -78,7 +94,8 @@ def create_app(initial_classes=None):
     @app.get("/classes/<int:class_id>")
     def class_detail(class_id):
         fitness_class = next(
-            (item for item in classes if item["id"] == class_id), None
+            (item for item in classes if item["id"] == class_id),
+            None,
         )
         if fitness_class is None:
             return jsonify({"error": "Class not found."}), 404
