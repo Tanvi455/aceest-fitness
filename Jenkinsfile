@@ -32,6 +32,11 @@ pipeline {
         }
       }
     }
+    stage('Container Tests') {
+      steps {
+        sh 'docker build --target test -t $IMAGE:test-$TAG .'
+      }
+    }
     stage('Docker Build & Push') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
