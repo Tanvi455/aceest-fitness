@@ -1,4 +1,3 @@
-def scannerHome
 pipeline {
   agent any
   environment {
@@ -23,7 +22,7 @@ pipeline {
       steps {
         script { scannerHome = tool 'SonarScanner' }
         withSonarQubeEnv('SonarQube') {
-          sh "${scannerHome}/bin/sonar-scanner"
+          sh '/opt/sonar-scanner/bin/sonar-scanner'
         }
       }
     }
