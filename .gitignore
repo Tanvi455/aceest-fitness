@@ -7,3 +7,7 @@ venv/
 .env
 .coverage
 htmlcov/
+coverage.xml
+.scannerwork/
+kubectl
+minikube-linux-amd64
