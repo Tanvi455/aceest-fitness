@@ -1,4 +1,3 @@
-def scannerHome
 pipeline {
   agent any
   environment {
@@ -21,9 +20,8 @@ pipeline {
     }
     stage('SonarQube Analysis') {
       steps {
-        script { scannerHome = tool 'SonarScanner' }
         withSonarQubeEnv('SonarQube') {
-          sh "${scannerHome}/bin/sonar-scanner"
+          sh '/opt/sonar-scanner/bin/sonar-scanner'
         }
       }
     }
@@ -32,6 +30,11 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES') {
           waitForQualityGate abortPipeline: true
         }
+      }
+    }
+    stage('Container Tests') {
+      steps {
+        sh 'docker build --target test -t $IMAGE:test-$TAG .'
       }
     }
     stage('Docker Build & Push') {
